@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <iostream>
-#include <string>
 #include <stdexcept>
+#include <string>
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "zbar.h"
@@ -14,7 +14,7 @@ using std::endl;
 
 int main(int argc, char* argv[]) {
   cv::VideoCapture cap(0);
-  
+
   cerr << cap.get(CV_CAP_PROP_FRAME_WIDTH) << " " << cap.get(CV_CAP_PROP_FRAME_HEIGHT) << endl;
 
   if (!cap.isOpened()) {
@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
     }
 
     cv::imshow("camera", frame);
-  
+
     const int key = cv::waitKey(1);
 
     if (key == 's') {
