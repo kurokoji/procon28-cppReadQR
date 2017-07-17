@@ -15,12 +15,17 @@ using std::endl;
 int main(int argc, char* argv[]) {
   cv::VideoCapture cap(0);
 
-  cerr << cap.get(CV_CAP_PROP_FRAME_WIDTH) << " " << cap.get(CV_CAP_PROP_FRAME_HEIGHT) << endl;
+  if (argc == 0) {
+    cerr << "not given argument!!" << endl;
+    return -1;
+  }
 
   if (!cap.isOpened()) {
     cerr << "Can't open the camera" << endl;
     return -1;
   }
+
+  cerr << cap.get(CV_CAP_PROP_FRAME_WIDTH) << " " << cap.get(CV_CAP_PROP_FRAME_HEIGHT) << endl;
 
   zbar::ImageScanner scanner;
   scanner.set_config(zbar::ZBAR_NONE, zbar::ZBAR_CFG_ENABLE, 1);
@@ -73,10 +78,13 @@ int main(int argc, char* argv[]) {
   }
 
   try {
-    std::string str = util::format(res);
+    std::string str =
+        (std::atoi(argv[1]) == 0) ? util::problem_format(res) : util::hint_format(res);
     cout << str;
   } catch (std::exception& e) {
     cerr << e.what() << endl;
+  } catch (const char* e) {
+    cerr << e << endl;
   }
 
   return 0;
