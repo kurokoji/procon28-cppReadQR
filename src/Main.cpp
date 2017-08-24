@@ -6,19 +6,22 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "zbar.h"
 
+#include "Piece.hpp"
 #include "format.hpp"
 
-using std::cerr;
-using std::cout;
-using std::endl;
-
 int main(int argc, char* argv[]) {
-  cv::VideoCapture cap(0);
+  using std::cerr;
+  using std::cout;
+  using std::endl;
+
+  std::vector<Polygon> pieces, pframe;
 
   if (argc == 0) {
     cerr << "not given argument!!" << endl;
     return -1;
   }
+
+  cv::VideoCapture cap(std::atoi(argv[2]));
 
   if (!cap.isOpened()) {
     cerr << "Can't open the camera" << endl;
@@ -35,7 +38,7 @@ int main(int argc, char* argv[]) {
   while (true) {
     cv::Mat frame, gray;
     cap >> frame;
-    cv::resize(frame, frame, cv::Size(), 0.5, 0.5);
+    // cv::resize(frame, frame, cv::Size(), 0.5, 0.5);
     cv::cvtColor(frame, gray, cv::COLOR_BGR2RGB);
     cv::cvtColor(gray, gray, cv::COLOR_BGR2GRAY);
 
@@ -70,21 +73,32 @@ int main(int argc, char* argv[]) {
     const int key = cv::waitKey(1);
 
     if (key == 's') {
-      res += symbol_str;
+      // res += symbol_str;
+      try {
+        if (std::stoi(argv[1]) == 0) {
+          util::problem_format(symbol_str, pieces, pframe);
+        } else {
+          util::hint_format(symbol_str, pieces);
+        }
+      } catch (std::exception& e) {
+        cerr << e.what() << endl;
+      } catch (const char* e) {
+        cerr << e << endl;
+      }
       cerr << "get: " << symbol_str << endl;
     } else if (key == 'q') {
       break;
     }
   }
 
-  try {
-    std::string str =
-        (std::atoi(argv[1]) == 0) ? util::problem_format(res) : util::hint_format(res);
-    cout << str;
-  } catch (std::exception& e) {
-    cerr << e.what() << endl;
-  } catch (const char* e) {
-    cerr << e << endl;
+  if (std::stoi(argv[1]) == 0) {
+    cout << pieces.size() << endl;
+    for (auto&& piece : pieces) cout << piece;
+    cout << pframe.size() << endl;
+    for (auto&& hole : pframe) cout << hole;
+  } else {
+    cout << pieces.size() << endl;
+    for (auto&& piece : pieces) cout << piece;
   }
 
   return 0;
